@@ -2,9 +2,12 @@
 
 namespace Technodrive\Process;
 
+use Technodrive\Core\Factory\ResponseFactory;
 use Technodrive\Core\Request;
+use Technodrive\Core\Response;
 use Technodrive\Process\Enumeration\StepEnum;
 use Technodrive\Process\Interface\StepInterface;
+use Technodrive\Router\RouteMatch;
 use Technodrive\Router\Router;
 
 class Process implements StepInterface
@@ -12,7 +15,12 @@ class Process implements StepInterface
 
     protected StepEnum $currentStep;
     protected Request $request;
+    protected Response $response;
     protected Router $router;
+    protected RouteMatch $routeMatch;
+
+    protected string$controllerModule;
+
     public function setCurrentStep(StepEnum $step): self
     {
         unset($this->currentStep);
@@ -49,6 +57,24 @@ class Process implements StepInterface
     }
 
     /**
+     * @return Response
+     */
+    public function getResponse(): Response
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param Response $response
+     * @return Process
+     */
+    public function setResponse(Response $response): Process
+    {
+        $this->response = $response;
+        return $this;
+    }
+
+    /**
      * @return Router
      */
     public function getRouter(): Router
@@ -66,4 +92,39 @@ class Process implements StepInterface
         return $this;
     }
 
+    /**
+     * @return RouteMatch
+     */
+    public function getRouteMatch(): RouteMatch
+    {
+        return $this->routeMatch;
+    }
+
+    /**
+     * @param RouteMatch $routeMatch
+     * @return Process
+     */
+    public function setRouteMatch(RouteMatch $routeMatch): Process
+    {
+        $this->routeMatch = $routeMatch;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllerModule(): string
+    {
+        return $this->controllerModule;
+    }
+
+    /**
+     * @param string $controllerModule
+     * @return Process
+     */
+    public function setControllerModule(string $controllerModule): Process
+    {
+        $this->controllerModule = $controllerModule;
+        return $this;
+    }
 }
