@@ -3,7 +3,9 @@
 namespace Technodrive\Process;
 
 use Technodrive\Core\Enumeration\ProcessStepEnum;
+use Technodrive\Core\Interface\ListenerInterface;
 use Technodrive\Core\Service\ServiceManager;
+use Technodrive\Process\Exception\BadListenerException;
 use Technodrive\Process\Interface\ProcessInterface;
 
 class ProcessManager implements ProcessInterface
@@ -65,9 +67,15 @@ class ProcessManager implements ProcessInterface
         $this->triggerListener($step);
     }
 
+    /**
+     * @param Process $step
+     * @return void
+     * @throws BadListenerException
+     * @throws \Technodrive\Core\Exception\BadFactoryException
+     * @todo aggregate listeners to permit listener detachment
+     */
     public function triggerListener(Process $step): void
     {
-
         $stepName = $step->getCurrentStepName();
         $listeners = $this->configuration['listeners'];
         if(! isset($listeners['listen'][$stepName])){
@@ -78,6 +86,9 @@ class ProcessManager implements ProcessInterface
         foreach ($listeners['listen'][$stepName] as $listener){
             //@todo call a specific method
             $callable = $this->serviceManager->get($listener);
+            if(! $callable instanceof ListenerInterface) {
+                throw new BadListenerException(sprintf('Listener %1$s must implement %2$s', $callable::class, ListenerInterface::class));
+            }
             $callable->call();
         }
     }
